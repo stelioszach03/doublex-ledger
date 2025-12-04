@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.git/
+.gitignore
+.env
+*.log
+build/
+dist/
+*.egg-info/
+.cache/
+node_modules/
+ledger/tests/
+ledger/apps/recon/reports/
+docker-compose.override.yml

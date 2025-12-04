@@ -1,0 +1,81 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Transactions per second",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(ledger_tx_total[1m]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "p95 Posting Latency (ms)",
+      "fieldConfig": {"defaults": {"unit": "ms"}},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum(rate(ledger_posting_latency_ms_bucket[5m])) by (le))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "Serialization Retries (/s)",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(ledger_serialization_retries_total[1m]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    },
+    {
+      "type": "timeseries",
+      "title": "Recon Mismatches (/s)",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(ledger_recon_mismatches_total[1m]))"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP 5xx Error Rate (%)",
+      "fieldConfig": {"defaults": {"unit": "percent"}},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))) * 100"
+        }
+      ],
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 16}
+    }
+  ],
+  "schemaVersion": 38,
+  "timezone": "browser",
+  "title": "Ledger SLO",
+  "version": 1
+}

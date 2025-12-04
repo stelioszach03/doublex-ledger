@@ -1,0 +1,77 @@
+networks:
+  ledger:
+    driver: bridge
+
+volumes:
+  db_data:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-ledger}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ledger}
+      POSTGRES_DB: ${DB_NAME:-ledger}
+    command: ["postgres", "-c", "max_connections=200"]
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ledger}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - ledger
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DSN: ${POSTGRES_DSN:-postgresql+psycopg://ledger:ledger@postgres:5432/ledger}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      MIGRATE_ON_START: ${MIGRATE_ON_START:-true}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ledger
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+    networks:
+      - ledger
+
+  grafana:
+    image: grafana/grafana:10.4.3
+    restart: unless-stopped
+    environment:
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - PROMETHEUS_URL=http://prometheus:9090
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - ledger

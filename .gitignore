@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+htmlcov/
+
+# Local test DB
+test-ledger.db
+
+# Environments
+.venv/
+.env
+.env.*
+*.log
+
+# Build
+build/
+dist/
+*.egg-info/
+.cache/
+
+# macOS
+.DS_Store
+.ipynb_checkpoints/
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Coverage
+.coverage
+coverage.xml
+
+# Docker
+docker-compose.override.yml
+
+# Project artifacts
+ledger/apps/recon/reports/
+node_modules/
