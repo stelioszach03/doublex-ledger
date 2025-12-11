@@ -19,10 +19,10 @@ jobs:
           POSTGRES_PASSWORD: ledger
           POSTGRES_DB: ledger
         options: >-
-          --health-cmd "pg_isready -U ledger" \
-          --health-interval 5s \
-          --health-timeout 5s \
-          --health-retries 20
+          --health-cmd=pg_isready -U ledger
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
