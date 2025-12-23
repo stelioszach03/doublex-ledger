@@ -37,11 +37,13 @@ jobs:
       - name: Alembic migrate
         env:
           POSTGRES_DSN: postgresql+psycopg://ledger:ledger@localhost:5432/ledger
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           alembic upgrade head
       - name: Run tests with coverage
         env:
           POSTGRES_DSN: postgresql+psycopg://ledger:ledger@localhost:5432/ledger
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest --cov=ledger --cov-report=term-missing
       - name: Build Docker images
