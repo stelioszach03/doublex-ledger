@@ -29,9 +29,26 @@ depends_on = None
 
 def upgrade() -> None:
     # --- Enums ---
-    account_status = sa.Enum("active", "blocked", name="account_status")
-    transfer_status = sa.Enum("applied", "duplicate", "rejected", name="transfer_status")
-    recon_status = sa.Enum("open", "resolved", name="recon_status")
+    # Pre-create named enums with create_type disabled on column usage to avoid duplicate CREATE TYPE
+    account_status = sa.Enum(
+        "active",
+        "blocked",
+        name="account_status",
+        create_type=False,
+    )
+    transfer_status = sa.Enum(
+        "applied",
+        "duplicate",
+        "rejected",
+        name="transfer_status",
+        create_type=False,
+    )
+    recon_status = sa.Enum(
+        "open",
+        "resolved",
+        name="recon_status",
+        create_type=False,
+    )
 
     bind = op.get_bind()
     account_status.create(bind, checkfirst=True)
@@ -241,4 +258,3 @@ DROP FUNCTION IF EXISTS check_entry_ccy() CASCADE;
     sa.Enum(name="recon_status").drop(bind, checkfirst=True)
     sa.Enum(name="transfer_status").drop(bind, checkfirst=True)
     sa.Enum(name="account_status").drop(bind, checkfirst=True)
-
