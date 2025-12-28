@@ -30,20 +30,20 @@ depends_on = None
 def upgrade() -> None:
     # --- Enums ---
     # Pre-create named enums with create_type disabled on column usage to avoid duplicate CREATE TYPE
-    account_status = sa.Enum(
+    account_status = postgresql.ENUM(
         "active",
         "blocked",
         name="account_status",
         create_type=False,
     )
-    transfer_status = sa.Enum(
+    transfer_status = postgresql.ENUM(
         "applied",
         "duplicate",
         "rejected",
         name="transfer_status",
         create_type=False,
     )
-    recon_status = sa.Enum(
+    recon_status = postgresql.ENUM(
         "open",
         "resolved",
         name="recon_status",
