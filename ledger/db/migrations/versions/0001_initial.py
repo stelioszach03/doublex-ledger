@@ -166,10 +166,6 @@ def upgrade() -> None:
 -- Enforce Account.ccy = Entry.ccy
 -- Set default isolation level to SERIALIZABLE
 
--- Amount non-zero (idempotent)
-ALTER TABLE IF EXISTS entries
-    ADD CONSTRAINT IF NOT EXISTS ck_entries_amount_nonzero CHECK (amount <> 0);
-
 -- Tolerance 1e-6 for balance
 CREATE OR REPLACE FUNCTION check_journal_balanced() RETURNS TRIGGER AS $$
 DECLARE
