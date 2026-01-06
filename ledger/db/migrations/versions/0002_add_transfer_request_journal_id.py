@@ -10,7 +10,7 @@ from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
-revision = "0002_add_transfer_request_journal_id"
+revision = "0002_add_tr_journal"
 down_revision = "0001_initial"
 branch_labels = None
 depends_on = None
@@ -27,4 +27,3 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index("ix_transfer_requests_journal_id", table_name="transfer_requests")
     op.drop_column("transfer_requests", "journal_id")
-
