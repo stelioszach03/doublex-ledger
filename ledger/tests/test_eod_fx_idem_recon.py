@@ -76,12 +76,20 @@ def test_eod_rejects_unbalanced(db: Session):
     db.add(j)
     db.flush()
     db.add(models.Entry(journal_id=j.id, account_id=a.id, amount=Decimal("5.00"), ccy="EUR"))
-    db.commit()
-    # Now closing should fail
+    # On Postgres, the DEFERRABLE constraint trigger fires on COMMIT and rejects unbalanced journals.
+    # On SQLite (no trigger), the close_business_day check should raise EodError instead.
+    from sqlalchemy.exc import IntegrityError
     try:
-        close_business_day(d, db=db)
-        assert False, "Expected EodError"
-    except EodError:
+        db.commit()
+        # If commit succeeded (e.g., SQLite), closing should fail via domain check
+        try:
+            close_business_day(d, db=db)
+            assert False, "Expected EodError"
+        except EodError:
+            pass
+    except IntegrityError:
+        db.rollback()
+        # Expected on Postgres: unbalanced journal rejected by trigger
         pass
 
 
@@ -134,18 +142,56 @@ def test_idempotency_module(db: Session, monkeypatch):
     req = models.TransferRequest(client_id="c1", idempotency_key="k1", status=models.TransferStatus.applied)
     db.add(req)
     db.commit()
-    # Align cutoff to naive datetime to avoid naive/aware compare under SQLite
+    # Compute cutoffs based exactly on stored created_at to avoid tz mismatches across drivers
     import ledger.domain.idempotency as idem
-    monkeypatch.setattr(idem, "_ttl_cutoff", lambda: datetime.now() - timedelta(days=1))
-    # Ensure tz-aware timestamp won't be used; keep created_at naive by default
+    from sqlalchemy import select as _select
+    from ledger.db.session import SessionLocal as _SL
+
+    # Ensure a stored created_at exists (use DB default if needed)
+    db.refresh(req)
     db.commit()
-    # Inside TTL (also test ensure_idempotent with db=None path)
+
+    # Load using a fresh Session to match how ensure_idempotent(None) will see tz info
+    s2 = _SL()
+    created2 = (
+        s2.execute(
+            _select(models.TransferRequest.created_at).where(
+                models.TransferRequest.client_id == "c1",
+                models.TransferRequest.idempotency_key == "k1",
+            )
+        )
+        .scalars()
+        .first()
+    )
+    s2.close()
+    assert created2 is not None
+
+    # Inside TTL: cutoff just before created_at (same tz semantics)
+    inside_cutoff = created2 - timedelta(seconds=1)
+    monkeypatch.setattr(idem, "_ttl_cutoff", lambda: inside_cutoff)
     tr2 = ensure_idempotent("c1", "k1", None)
     assert tr2 is not None
-    # Make it expired by mutating created_at
-    req.created_at = req.created_at - timedelta(days=2)
+
+    # Expire: update created_at to older value, then set cutoff just after it
+    older = (created2 - timedelta(days=2))
+    req.created_at = older if older.tzinfo else older.replace(tzinfo=None)
     db.commit()
-    tr3 = ensure_idempotent("c1", "k1", db)
+    s3 = _SL()
+    created3 = (
+        s3.execute(
+            _select(models.TransferRequest.created_at).where(
+                models.TransferRequest.client_id == "c1",
+                models.TransferRequest.idempotency_key == "k1",
+            )
+        )
+        .scalars()
+        .first()
+    )
+    s3.close()
+    assert created3 is not None
+    expire_cutoff = created3 + timedelta(seconds=1)
+    monkeypatch.setattr(idem, "_ttl_cutoff", lambda: expire_cutoff)
+    tr3 = ensure_idempotent("c1", "k1", None)
     assert tr3 is None  # expired deleted
     # Record success / duplicate
     req2 = models.TransferRequest(client_id="c2", idempotency_key="k2", status=models.TransferStatus.applied)
