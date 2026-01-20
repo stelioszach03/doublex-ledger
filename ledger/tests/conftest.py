@@ -35,9 +35,10 @@ def db() -> Session:
     try:
         # Clean tables before each test (truncate order matters for FKs)
         for tbl in [
+            # Children first, then parents (for PostgreSQL FK constraints)
             models.Entry.__table__,
-            models.Journal.__table__,
             models.TransferRequest.__table__,
+            models.Journal.__table__,
             models.BalanceSnapshot.__table__,
             models.FxRate.__table__,
             models.EodClose.__table__,
