@@ -9,6 +9,10 @@ on:
 jobs:
   lint_test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.11', '3.12' ]
     services:
       postgres:
         image: postgres:16-alpine
@@ -27,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: requirements.txt
       - name: Install dependencies
@@ -36,16 +40,27 @@ jobs:
           pip install -r requirements.txt
       - name: Alembic migrate
         env:
+          APP_ENV: dev
           POSTGRES_DSN: postgresql+psycopg://ledger:ledger@localhost:5432/ledger
           PYTHONPATH: ${{ github.workspace }}
         run: |
           alembic upgrade head
       - name: Run tests with coverage
         env:
+          APP_ENV: dev
           POSTGRES_DSN: postgresql+psycopg://ledger:ledger@localhost:5432/ledger
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          pytest --cov=ledger --cov-report=term-missing
+          pytest --cov=ledger --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=html
+
+      - name: Upload coverage artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-py${{ matrix.python-version }}
+          path: |
+            coverage.xml
+            htmlcov
       - name: Build Docker images
         run: |
           docker build -f docker/Dockerfile.api -t ledger-api-ci .
