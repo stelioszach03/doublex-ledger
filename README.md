@@ -1,5 +1,4 @@
 ![CI](https://github.com/stelioszach03/doublex-ledger/actions/workflows/ci.yml/badge.svg)
-<!-- CI trigger: README touch to re-run workflow -->
 
 # DoubleX Ledger
 
