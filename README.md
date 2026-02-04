@@ -27,7 +27,7 @@ Quickstart
   - export POSTGRES_DSN="postgresql+psycopg://ledger:ledger@localhost:5432/ledger"
   - make dev
 - Docker Compose
-  - cp .env.example .env (ή χρησιμοποιήστε το έτοιμο .env)
+  - cp .env.example .env (or use the provided .env)
   - make compose-up
   - API: http://localhost:8000 • Prometheus: http://localhost:9090 • Grafana: http://localhost:3000
 
@@ -52,7 +52,7 @@ Bench & KPIs
 - Reports success rate, p95 latency, failures, achieved TPS.
 
 Runbook
-- Migrations: MIGRATE_ON_START=true (Compose) ή `make migrate` / `make makemigration m="..."`.
+- Migrations: MIGRATE_ON_START=true (Compose) or `make migrate` / `make makemigration m="..."`.
 - Logs: LOG_FORMAT=json για structured logging (Loguru).
 - OTEL: set OTEL_EXPORTER_OTLP_ENDPOINT (e.g. http://otel-collector:4318).
 
