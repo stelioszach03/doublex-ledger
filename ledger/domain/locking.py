@@ -10,9 +10,14 @@ from sqlalchemy import text
 
 
 def _hash_key(key: str) -> int:
-    # Map arbitrary string to int64 for advisory lock
+    # Map arbitrary string to a SIGNED int64 for pg_advisory_[xact_]lock.
+    # Taking 16 hex digits yields an UNSIGNED 64-bit integer (0..2^64-1) which
+    # overflows Postgres' bigint range (-2^63..2^63-1) roughly half the time
+    # (crashes with `bigint out of range`). Convert unsigned → signed by
+    # subtracting 2^64 when the high bit is set.
     h = hashlib.sha256(key.encode()).hexdigest()[:16]
-    return int(h, 16)
+    u = int(h, 16)
+    return u if u < (1 << 63) else u - (1 << 64)
 
 
 @contextmanager
