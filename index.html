@@ -232,11 +232,10 @@ h1.display em {
   border-top: 2px solid var(--gold);
   overflow: hidden;
   box-shadow: 0 20px 60px -18px rgba(0, 0, 0, 0.6);
-  font-family: var(--mono);
   margin-top: 12px;
 }
 .t-head {
-  padding: 18px 24px;
+  padding: 20px 28px;
   border-bottom: 2px solid var(--ink);
   background: var(--bg-deep);
   display: flex; justify-content: space-between; align-items: center;
@@ -244,49 +243,62 @@ h1.display em {
 }
 .t-title {
   font-family: var(--display);
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   color: var(--ink);
   font-style: italic;
   font-weight: 500;
   letter-spacing: -0.005em;
 }
 .t-stamp {
-  font-family: var(--mono); font-size: 0.58rem;
-  color: var(--gold); letter-spacing: 0.18em;
+  font-family: var(--mono); font-size: 0.56rem;
+  color: var(--gold); letter-spacing: 0.2em;
   text-transform: uppercase;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border: 1px solid var(--gold);
   border-radius: 2px;
+  white-space: nowrap;
 }
 .t-body {
   display: grid;
-  grid-template-columns: 1fr 1px 1fr;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   background: var(--rule);
 }
 .t-side {
   background: var(--paper);
-  padding: 26px 30px;
+  padding: 28px 32px;
+  min-width: 0;
 }
 .t-side-label {
-  font-family: var(--mono); font-size: 0.58rem;
-  color: var(--ash); letter-spacing: 0.22em; text-transform: uppercase;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
+  font-family: var(--mono); font-size: 0.6rem;
+  color: var(--ash); letter-spacing: 0.24em; text-transform: uppercase;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--rule);
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.t-side-label .ccy {
+  color: var(--gold);
 }
 .t-row {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 20px;
-  padding: 8px 0;
-  font-size: 0.84rem;
+  grid-template-columns: minmax(0, 1fr) 110px;
+  gap: 16px;
+  padding: 10px 0;
+  font-size: 0.86rem;
   color: var(--ink-dim);
   border-bottom: 1px dotted var(--rule);
+  align-items: baseline;
 }
+.t-row:last-child { border-bottom: none; }
 .t-row .acc {
   color: var(--ink);
   font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .t-row .amt {
   font-family: var(--mono);
@@ -294,31 +306,56 @@ h1.display em {
   color: var(--gold);
   text-align: right;
   letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.84rem;
+  white-space: nowrap;
 }
 .t-row .amt.credit { color: var(--sage); }
+.t-row.total { padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--rule); border-bottom: none; }
+.t-row.total .acc { color: var(--gold); font-weight: 500; }
+.t-row.total .acc.credit { color: var(--sage); }
+.t-row.total .amt { color: var(--gold); font-weight: 600; }
+.t-row.total .amt.credit { color: var(--sage); }
+.t-row.ghost { opacity: 0.25; }
+.t-row.ghost .acc, .t-row.ghost .amt { color: var(--ash-deep); }
 .t-foot {
-  padding: 16px 30px;
+  padding: 18px 32px;
   background: var(--paper-soft);
   border-top: 1px solid var(--rule);
   display: flex; justify-content: space-between; align-items: center;
-  font-family: var(--mono); font-size: 0.7rem;
+  font-family: var(--mono); font-size: 0.68rem;
+  gap: 16px; flex-wrap: wrap;
 }
 .t-foot .balanced {
   color: var(--sage); letter-spacing: 0.14em;
   display: flex; align-items: center; gap: 8px;
+  text-transform: uppercase;
 }
 .t-foot .balanced::before {
   content: "●"; color: var(--sage);
   animation: pulse 2s ease-in-out infinite;
+  font-size: 0.7rem;
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
 }
-.t-foot .total { color: var(--ink); font-weight: 500; }
+.t-foot .total-note {
+  color: var(--ash); font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+.t-foot .total-note code {
+  font-family: var(--mono);
+  color: var(--gold);
+  background: rgba(201, 169, 110, 0.08);
+  padding: 1px 5px; border-radius: 2px;
+}
 @media (max-width: 800px) {
   .t-body { grid-template-columns: 1fr; }
   .t-side { border-bottom: 1px solid var(--rule); }
+  .t-side:last-child { border-bottom: none; }
+  .t-row { grid-template-columns: minmax(0, 1fr) 90px; }
 }
 
 /* ═══════════════════ SECTION BASE ═══════════════════ */
@@ -704,26 +741,58 @@ footer.colophon {
     <!-- T-account hero visual -->
     <div class="t-account" id="primitive">
       <div class="t-head">
-        <div class="t-title">Journal · Wire transfer 4,500.00 EUR · tx-0c47a2</div>
-        <div class="t-stamp">✓ POSTED · SERIALIZABLE</div>
+        <div class="t-title">Journal · Wire transfer · <code style="font-family:var(--mono);font-size:0.85rem;color:var(--gold);font-style:normal;">tx-0c47a2</code></div>
+        <div class="t-stamp">✓ Posted · Serializable</div>
       </div>
       <div class="t-body">
         <div class="t-side">
-          <div class="t-side-label"><span>Debit</span><span>EUR</span></div>
-          <div class="t-row"><span class="acc">2001-LIABILITIES</span><span class="amt">4,500.00</span></div>
-          <div class="t-row"><span class="acc">6100-BANK_FEES</span><span class="amt">15.00</span></div>
-          <div class="t-row" style="border-bottom:none; font-weight: 500;"><span class="acc" style="color:var(--gold)">total debit</span><span class="amt">4,515.00</span></div>
+          <div class="t-side-label">
+            <span>Debit</span>
+            <span class="ccy">EUR</span>
+          </div>
+          <div class="t-row">
+            <span class="acc">2001-LIABILITIES</span>
+            <span class="amt">4,500.00</span>
+          </div>
+          <div class="t-row">
+            <span class="acc">6100-BANK_FEES</span>
+            <span class="amt">15.00</span>
+          </div>
+          <div class="t-row ghost">
+            <span class="acc">—</span>
+            <span class="amt">—</span>
+          </div>
+          <div class="t-row total">
+            <span class="acc">total debit</span>
+            <span class="amt">4,515.00</span>
+          </div>
         </div>
         <div class="t-side">
-          <div class="t-side-label"><span>Credit</span><span>EUR</span></div>
-          <div class="t-row"><span class="acc">1001-CASH</span><span class="amt credit">4,515.00</span></div>
-          <div class="t-row" style="visibility:hidden"><span class="acc">—</span><span class="amt">—</span></div>
-          <div class="t-row" style="border-bottom:none; font-weight: 500;"><span class="acc" style="color:var(--sage)">total credit</span><span class="amt credit">4,515.00</span></div>
+          <div class="t-side-label">
+            <span>Credit</span>
+            <span class="ccy">EUR</span>
+          </div>
+          <div class="t-row">
+            <span class="acc">1001-CASH</span>
+            <span class="amt credit">4,515.00</span>
+          </div>
+          <div class="t-row ghost">
+            <span class="acc">—</span>
+            <span class="amt">—</span>
+          </div>
+          <div class="t-row ghost">
+            <span class="acc">—</span>
+            <span class="amt">—</span>
+          </div>
+          <div class="t-row total">
+            <span class="acc credit">total credit</span>
+            <span class="amt credit">4,515.00</span>
+          </div>
         </div>
       </div>
       <div class="t-foot">
         <span class="balanced">Δ = 0.00 · balanced</span>
-        <span class="total">enforced by DB trigger · retry-safe via idempotency_key</span>
+        <span class="total-note">enforced by DB trigger · retry-safe via <code>idempotency_key</code></span>
       </div>
     </div>
   </section>
