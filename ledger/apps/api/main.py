@@ -6,6 +6,7 @@ import sys
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from ledger.apps.api.observability.tracing import init_tracing
@@ -68,6 +69,20 @@ async def lifespan(app: FastAPI):
 
 _settings = get_settings()
 app = FastAPI(title=_settings.app_name, version=_settings.app_version, lifespan=lifespan)
+
+# CORS — open to make the public landing widgets callable from any origin
+# (portfolio preview, localhost, stelioszach.com itself). The API is read-
+# dominant and write endpoints are idempotent + bounded to demo accounts,
+# so wide-open CORS is intentional for the portfolio demo.
+_cors_env = os.getenv("CORS_ALLOW_ORIGINS", "*")
+_allow_origins = ["*"] if _cors_env.strip() == "*" else [o.strip() for o in _cors_env.split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_allow_origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Routers
 app.include_router(health.router)
