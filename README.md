@@ -1,13 +1,24 @@
-![CI](https://github.com/stelioszach03/doublex-ledger/actions/workflows/ci.yml/badge.svg)
-![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)
-![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-informational)
+<div align="center">
+
+[![CI](https://github.com/stelioszach03/doublex-ledger/actions/workflows/ci.yml/badge.svg)](https://github.com/stelioszach03/doublex-ledger/actions)
 
 # DoubleX Ledger
 
-A production-grade **double-entry accounting ledger**: SERIALIZABLE isolation,
-idempotent postings, end-of-day close, FX settlement, reconciliation CLI, and
-first-class observability. FastAPI on top, PostgreSQL doing the work.
+**Production-grade double-entry accounting ledger with SERIALIZABLE isolation, idempotent postings, FX settlement, reconciliation CLI, and first-class observability.**
+
+[![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white)](https://prometheus.io/)
+[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen?style=flat-square)](.)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square)](LICENSE)
+
+**[Live Landing](https://stelioszach.com/doublex-ledger/)**  ·  **[Idempotency Widget](https://stelioszach.com/doublex-ledger/#live)**  ·  **[API Docs](https://stelioszach.com/doublex-ledger/live/docs)**  ·  **[Prometheus](https://stelioszach.com/doublex-ledger/live/metrics)**
+
+</div>
+
+FastAPI on top, PostgreSQL doing the work.
 
 > Every guarantee is enforced where it's hardest to break — at the database
 > layer. The service code is thin on top: it reads, validates, posts under a
