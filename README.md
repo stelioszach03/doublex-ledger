@@ -10,7 +10,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white)](https://prometheus.io/)
-[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen?style=flat-square)](.)
+[![Tests](https://img.shields.io/badge/tests-pytest%20%2B%20Hypothesis-0A9EDC?style=flat-square)](tests/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square)](LICENSE)
 
@@ -192,8 +192,27 @@ pytest --cov=ledger --cov-report=term-missing
 pytest tests/test_double_entry_properties.py
 ```
 
-CI runs on every push on Python 3.11 and 3.12 with a real Postgres service and
-uploads coverage artefacts.
+CI runs on every push on Python 3.11 and 3.12 against a real Postgres service and
+uploads `coverage.xml` + `htmlcov` as build artifacts. **There is no coverage
+threshold gate and no coverage report committed to this repo**, so no coverage
+percentage is claimed here — download the artifact from a CI run to see the
+current figure.
+
+---
+
+## Limitations
+
+- **No committed coverage or benchmark artifact.** The Locust bench and the
+  coverage report are runnable (`make bench`, `pytest --cov`) but their outputs
+  are not in the repo, so no performance or coverage number is asserted.
+- **Single-currency journals.** FX settlement is modelled as two journals through
+  a clearing account; a native multi-currency posting is roadmap, not shipped.
+- **Single-tenant.** There is no `entity_id` partitioning and no authentication
+  on the admin surface.
+- **SERIALIZABLE has a cost.** Under contention the retry path on `40001` is
+  exercised by tests but has not been profiled at scale.
+- **Reconciliation matching is deliberately simple**: exact `ref` first, then
+  amount within ±0.01. No fuzzy payee matching.
 
 ---
 
